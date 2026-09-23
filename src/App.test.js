@@ -1,8 +1,10 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
+import App from "./App";
 
-test('renders learn react link', () => {
+test("renders the todo workspace", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(screen.getByRole("heading", { name: /keep your next step clear/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /add task/i })).toBeInTheDocument();
+  expect(screen.getByText(/no tasks yet/i)).toBeInTheDocument();
 });
