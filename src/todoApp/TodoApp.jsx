@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Button,
   FormControl,
@@ -32,6 +32,14 @@ function loadTodos() {
   }
 }
 
+function saveTodos(todos) {
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(todos));
+  } catch {
+    toast.error("Tasks could not be saved locally.");
+  }
+}
+
 function formatDate(value) {
   return new Intl.DateTimeFormat("en-IN", {
     dateStyle: "medium",
@@ -53,9 +61,10 @@ function TodoApp() {
   const firstRowIndex = (visiblePage - 1) * rowsPerPage;
   const visibleTodos = todoList.slice(firstRowIndex, firstRowIndex + rowsPerPage);
 
-  useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(todoList));
-  }, [todoList]);
+  const replaceTodos = (todos) => {
+    saveTodos(todos);
+    setTodoList(todos);
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -68,7 +77,8 @@ function TodoApp() {
     }
 
     const now = new Date().toISOString();
-    setTodoList((currentTodos) => [
+    const currentTodos = loadTodos();
+    replaceTodos([
       ...currentTodos,
       { id: uuidv4(), item: todoText, createdAt: now, updatedAt: now },
     ]);
@@ -96,7 +106,8 @@ function TodoApp() {
       return;
     }
 
-    setTodoList((currentTodos) =>
+    const currentTodos = loadTodos();
+    replaceTodos(
       currentTodos.map((currentTodo) =>
         currentTodo.id === todo.id
           ? { ...currentTodo, item: updatedText, updatedAt: new Date().toISOString() }
@@ -118,7 +129,8 @@ function TodoApp() {
       confirmButtonColor: "#b42318",
     }).then((result) => {
       if (result.isConfirmed) {
-        setTodoList((currentTodos) => currentTodos.filter((item) => item.id !== todo.id));
+        const currentTodos = loadTodos();
+        replaceTodos(currentTodos.filter((item) => item.id !== todo.id));
         if (editingId === todo.id) cancelEditing();
         toast.success("Task deleted.");
       }
