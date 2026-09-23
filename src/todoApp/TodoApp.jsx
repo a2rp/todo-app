@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Pagination,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -40,6 +45,13 @@ function TodoApp() {
   const [input, setInput] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editingInput, setEditingInput] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const totalPages = Math.max(1, Math.ceil(todoList.length / rowsPerPage));
+  const visiblePage = Math.min(currentPage, totalPages);
+  const firstRowIndex = (visiblePage - 1) * rowsPerPage;
+  const visibleTodos = todoList.slice(firstRowIndex, firstRowIndex + rowsPerPage);
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(todoList));
@@ -166,7 +178,7 @@ function TodoApp() {
                 </TableCell>
               </TableRow>
             ) : (
-              todoList.map((todo) => (
+              visibleTodos.map((todo) => (
                 <TableRow key={todo.id}>
                   <TableCell className={styles.idColumn} title={todo.id}>{todo.id.slice(0, 8)}</TableCell>
                   <TableCell>
@@ -208,6 +220,42 @@ function TodoApp() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {todoList.length > 0 && (
+        <div className={styles.paginationBar}>
+          <span className={styles.paginationSummary}>
+            Showing {firstRowIndex + 1}-{Math.min(firstRowIndex + rowsPerPage, todoList.length)} of {todoList.length} tasks
+          </span>
+          <div className={styles.paginationControls}>
+            <FormControl size="small" className={styles.rowsControl}>
+              <InputLabel id="rows-per-page-label">Rows</InputLabel>
+              <Select
+                labelId="rows-per-page-label"
+                value={rowsPerPage}
+                label="Rows"
+                onChange={(event) => {
+                  setRowsPerPage(Number(event.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                {[5, 10, 25].map((option) => (
+                  <MenuItem key={option} value={option}>{option}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Pagination
+              count={totalPages}
+              page={visiblePage}
+              onChange={(_, page) => setCurrentPage(page)}
+              color="primary"
+              size="small"
+              showFirstButton
+              showLastButton
+              aria-label="Todo list pages"
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
