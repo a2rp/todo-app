@@ -2,12 +2,13 @@
 
 ![Todo App preview](screenshot.png)
 
-Todo App is a responsive React task manager for capturing daily work, editing tasks, deleting completed items, and keeping the list available after refresh.
+Todo App is a responsive React task manager for capturing daily work, editing tasks, deleting items, and keeping the list available after refresh.
 
 ## Features
 
 - Add, edit, delete, and review tasks
-- Local browser storage for saved tasks
+- Direct localStorage CRUD with saved tasks after refresh
+- Pagination with 5, 10, or 25 rows per page
 - Responsive table layout with mobile navigation
 - Fixed header with logo, scroll-aware visibility, and keyboard-friendly controls
 - Accessible icon-only footer links and floating go-to-top button
